@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
     
-    @GetMapping("/")
+    @GetMapping("/hi")
     public String hello() {
         return "🚀 Algohire backend is running!";
     }
