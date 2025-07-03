@@ -52,7 +52,7 @@ public class Application extends Auditable{
     private ApplicationStatus applicationStatus;
 
     @Column(name="applied_at",nullable=false)
-    @NotBlank
+     
     private LocalDateTime appliedAt;
 
     private boolean isShortListed;

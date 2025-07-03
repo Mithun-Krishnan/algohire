@@ -18,9 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,36 +38,35 @@ public class Job extends Auditable{
     @Column(name = "id", columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
-    @NotBlank
-    @Size(max = 100)
+   
     @Column(name = "job_title", nullable = false)
     private String jobTitle;
 
-    @NotBlank
+     
     @Column(name = "job_description", nullable = false, columnDefinition = "TEXT")
     private String jobDescription;
 
-    @NotBlank
+     
     @Column(nullable = false)
     private String city;
 
-    @NotBlank
+     
     @Column(nullable = false)
     private String state;
 
-    @NotBlank
+     
     @Column(name = "address", nullable = false)
     private String address;
-    @NotBlank
+     
     @Column(nullable = false)
     private String salary;
 
-    @NotNull
+    
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadLine;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
+     
     @Column(name = "job_status", nullable = false)
     private JobStatus jobStatus;
     
@@ -81,9 +77,11 @@ public class Job extends Auditable{
 
     //using Auditble for thees 
 
-    // @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    // @JoinColumn(name = "created_by", nullable = false)
-    // private Users createdBy;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "created_by", nullable = false)
+    private Users createdBy;
+
+
 
 
     // @CreationTimestamp

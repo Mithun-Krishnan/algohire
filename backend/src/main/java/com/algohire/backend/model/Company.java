@@ -1,10 +1,8 @@
 package com.algohire.backend.model;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.algohire.backend.model.audit.Auditable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Company {
+public class Company extends Auditable {
 
     @Id
     @GeneratedValue
@@ -40,6 +38,10 @@ public class Company {
     @Size(max = 100)
     @Column(name = "name", nullable = false)
     private String name;
+
+
+    @Column(name="email")
+    private String email;
 
     @Size(max = 255)
     @Column(name = "website")
@@ -65,15 +67,15 @@ public class Company {
     @Column(name = "logo")
     private String logo;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "created_by", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY) // add, optional = false
+    @JoinColumn(name = "created_by")  //add this nullable = false
     private Users createdBy;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
+    // @CreationTimestamp
+    // @Column(name = "created_at", updatable = false) // add nullable = false
+    // private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    // @UpdateTimestamp
+    // @Column(name = "updated_at")  //add , nullable = false
+    // private LocalDateTime updatedAt;
 }
