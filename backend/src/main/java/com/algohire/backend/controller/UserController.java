@@ -29,22 +29,6 @@ public class UserController {
         return "helo user";
     }
 
-    @PostMapping("/candidate/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequestDto userRequestDto){
-        UserResponse response=userService.registerCandidate(userRequestDto);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
 
-    @PostMapping("/recruiter/registerNewCompsny")
-    public ResponseEntity<RecruiterResponseDto> recuiterRegisterNewCompany(@Valid @RequestBody RecruiterNewCompanyRequestDto recruiterRequestDto){
-        RecruiterResponseDto response=userService.recruiterNewCompanyRegister(recruiterRequestDto);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
-
-    @PostMapping("/recruiter/registerExistingcompany")
-    public ResponseEntity<RecruiterResponseDto> recruiterRegisterExistCompany(@Valid @RequestBody RecruiterExistCompanyRequstDto recruiterExistCompanyRequstDto){
-        RecruiterResponseDto response=userService.recuiterExistingCompany(recruiterExistCompanyRequstDto);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
-    }
 
 }

@@ -9,5 +9,6 @@ import com.algohire.backend.model.Users;
 public interface  UserRepository extends JpaRepository<Users, UUID> {
 
     boolean existsByEmail(String email);
+    Users findByUserName(String userName);
     
 }

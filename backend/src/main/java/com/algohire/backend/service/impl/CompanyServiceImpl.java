@@ -29,7 +29,8 @@ public class CompanyServiceImpl implements CompanyService {
                     .id(company.getId())
                     .message("company exist")
                     .build();
-        }
+       
+                }
 
         return CompanyResponseDto.builder()
         .exist(false)
