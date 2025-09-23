@@ -15,8 +15,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users users=userRepository.findByUserName(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Users users=userRepository.findByEmail(email);
 
         if(users==null){
             throw new UsernameNotFoundException("no user found");
@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public Users chekIfUsersAlredyExist(Users users){
-        return userRepository.findByUserName(users.getUsername());
+        return userRepository.findByUsername(users.getUsername());
     }
 
 }

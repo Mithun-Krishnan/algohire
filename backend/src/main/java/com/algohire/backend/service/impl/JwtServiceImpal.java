@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,18 +15,25 @@ import com.algohire.backend.service.JwtService;
 
 import io.jsonwebtoken.Claims;
 
-import javax.crypto.SecretKey;
-
 @Component
 public class JwtServiceImpal implements JwtService{
 
-    private final String SECRET="algohire";
+
+    @Value("${jwt.secret}")
+    private  String SECRET;
 
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String,Object> claims=new HashMap<>();
         return createToken(claims,userDetails.getUsername());
          
+    }
+
+    @Override
+    public String generateToken(String email) {
+        Map<String,Object> claims=new HashMap<>();
+        return createToken(claims,email);
+
     }
 
 

@@ -9,7 +9,7 @@ public interface RefreshTokenService {
     RefreshToken createRefreshToken(Users users);
     boolean isValid(String token);
     void deleteUsers(Users users);
-    RefreshToken valideToken(RefreshToken token);
+    RefreshToken validateToken(RefreshToken token);
     Optional<RefreshToken> findByToken(String token);
-
+    RefreshToken createRefreshToken(String email);
 }
