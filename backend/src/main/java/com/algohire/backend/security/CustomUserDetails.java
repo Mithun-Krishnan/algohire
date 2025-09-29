@@ -8,16 +8,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
 
     private String userName;
     private String password;
+    private UUID id;
 
     Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Users user) {
         this.userName=user.getUsername();
+        this.id=user.getId();
         this.password=user.getPassword();
 
         List<GrantedAuthority> auths=new ArrayList<>();
@@ -27,6 +30,10 @@ public class CustomUserDetails implements UserDetails {
             auths.add(new SimpleGrantedAuthority("ROLE_"+roleName));
         }
         this.authorities=auths;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     @Override

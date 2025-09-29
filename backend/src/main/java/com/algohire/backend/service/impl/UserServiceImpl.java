@@ -1,8 +1,14 @@
 package com.algohire.backend.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import com.algohire.backend.mapper.UserMapper;
+import com.algohire.backend.model.Skills;
+import com.algohire.backend.repository.SkillsRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +38,8 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
+    private final AuthserviceImpal authserviceImpal;
+    private final SkillsRepository skillsRepository;
 
 
 
@@ -51,8 +59,22 @@ public class UserServiceImpl implements UserService{
         throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
     }
 
+    @Override
+    public RecruiterResponseDto updateSkills(Set<UUID> skillIds) {
+//    public UserResponse updateSkills(Set<UUID> skillIds) {
+//        UUID userId=authserviceImpal.getCurrentUserId();
+//        Users users=userRepository.findById(userId).orElseThrow(()->
+//                new UsernameNotFoundException("//User with this id not found -->update skill user service impal"));
+//
+//        Set<Skills> skillsSet=new HashSet<>(skillsRepository.findAllById(skillIds));
+//        users.setSkills(skillsSet);
+//        userRepository.save(users);
+//
+//        return UserMapper.toResponse(users);
+
+        return RecruiterResponseDto.builder()
+                .email("").build();
+    }
 
 
-   
-    
 }

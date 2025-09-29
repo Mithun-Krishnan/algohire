@@ -12,10 +12,14 @@ import com.algohire.backend.model.Users;
 import com.algohire.backend.repository.CompanyRepository;
 import com.algohire.backend.repository.RoleRepository;
 import com.algohire.backend.repository.UserRepository;
+import com.algohire.backend.security.CustomUserDetails;
 import com.algohire.backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 
 @Service
@@ -63,7 +67,16 @@ public class AuthserviceImpal implements AuthService {
 
     }
 
+    @Override
+    public UUID getCurrentUserId() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getId();
+        } else {
+            throw new RuntimeException("User not authenticated");
+        }
+    }
 
 
 

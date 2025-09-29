@@ -1,6 +1,7 @@
 package com.algohire.backend.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.algohire.backend.dto.request.RecruiterExistCompanyRequstDto;
@@ -13,4 +14,7 @@ public interface UserService {
 
     UserResponse getUserById(UUID id);
     List<UserResponse> getAllUsers();
+    RecruiterResponseDto updateSkills(Set<UUID> skillIds);
+
+
 }

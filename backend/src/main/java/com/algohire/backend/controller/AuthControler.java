@@ -1,18 +1,17 @@
 package com.algohire.backend.controller;
 
-import com.algohire.backend.dto.request.LoginRequstDto;
-import com.algohire.backend.dto.request.RecruiterExistCompanyRequstDto;
-import com.algohire.backend.dto.request.RecruiterNewCompanyRequestDto;
-import com.algohire.backend.dto.request.UserRequestDto;
+import com.algohire.backend.dto.request.*;
 import com.algohire.backend.dto.response.JwtResponseDto;
 import com.algohire.backend.dto.response.RecruiterResponseDto;
 import com.algohire.backend.dto.response.UserResponse;
+import com.algohire.backend.exception.TokenNotFoundException;
 import com.algohire.backend.model.RefreshToken;
 import com.algohire.backend.service.JwtService;
 import com.algohire.backend.service.RefreshTokenService;
 import com.algohire.backend.service.impl.AuthserviceImpal;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth/v1")
 @AllArgsConstructor
+@Slf4j
 public class AuthControler {
 
     private final JwtService jwtService;
@@ -58,7 +58,7 @@ public class AuthControler {
 
     }
 
-    @PostMapping("/recruiter/registerNewCompsny")
+    @PostMapping("/recruiter/registerNewCompany")
     public ResponseEntity<JwtResponseDto> recuiterRegisterNewCompany(@Valid @RequestBody RecruiterNewCompanyRequestDto recruiterRequestDto){
         RecruiterResponseDto response=authserviceImpal.recruiterNewCompanyRegister(recruiterRequestDto);
 
@@ -102,5 +102,32 @@ public class AuthControler {
 
         throw new UsernameNotFoundException("invalid user or password");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody String refreshToken) {
+        refreshTokenService.findByToken(refreshToken)
+                .ifPresent(token->refreshTokenService.deleteUsers(token.getUsers())); // implement deleteToken
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponseDto> refresh(@RequestBody RefreshTokenRequstDto req) {
+
+        log.info("//Received refresh request for token: {}", req.getToken());
+        RefreshToken token = refreshTokenService.findByToken(req.getToken())
+                .orElseThrow(() -> new TokenNotFoundException("Refresh token not found"));
+
+        // validate refresh token (throws exception if expired and deletes it)
+        refreshTokenService.validateToken(token);
+
+        String newAccessToken = jwtService.generateToken(token.getUsers().getEmail());
+
+        return ResponseEntity.ok(JwtResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(token.getToken()) // reuse same refresh token
+                .build());
+    }
+
 
 }

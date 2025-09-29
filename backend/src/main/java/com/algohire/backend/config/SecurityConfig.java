@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/v1/login", "/auth/v1/refreshToken", "/auth/v1/candidate/register").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/candidate/**").hasRole("CANDIDATE")
+                        .requestMatchers("/auth/v1/refresh").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

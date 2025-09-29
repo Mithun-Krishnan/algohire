@@ -12,4 +12,8 @@ public interface RefreshTokenService {
     RefreshToken validateToken(RefreshToken token);
     Optional<RefreshToken> findByToken(String token);
     RefreshToken createRefreshToken(String email);
+    void deleteToken(String token);
+
+
+
 }
