@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/candidate/**").hasRole("CANDIDATE")
                         .requestMatchers("/auth/v1/refresh").permitAll()
+                        .requestMatchers("/api/users/allskills").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

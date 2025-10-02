@@ -4,7 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.algohire.backend.dto.response.SkillsResponseDto;
+import com.algohire.backend.dto.response.UserResponseSkills;
 import com.algohire.backend.mapper.UserMapper;
 import com.algohire.backend.model.Skills;
 import com.algohire.backend.repository.SkillsRepository;
@@ -12,14 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.algohire.backend.dto.request.RecruiterExistCompanyRequstDto;
-import com.algohire.backend.dto.request.RecruiterNewCompanyRequestDto;
-import com.algohire.backend.dto.request.UserRequestDto;
-import com.algohire.backend.dto.response.RecruiterResponseDto;
 import com.algohire.backend.dto.response.UserResponse;
-import com.algohire.backend.enums.RoleType;
-import com.algohire.backend.model.Company;
-import com.algohire.backend.model.Role;
 import com.algohire.backend.model.Users;
 import com.algohire.backend.repository.CompanyRepository;
 import com.algohire.backend.repository.RoleRepository;
@@ -60,20 +56,27 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public RecruiterResponseDto updateSkills(Set<UUID> skillIds) {
+    public UserResponseSkills updateSkills(Set<UUID> skillIds) {
 //    public UserResponse updateSkills(Set<UUID> skillIds) {
-//        UUID userId=authserviceImpal.getCurrentUserId();
-//        Users users=userRepository.findById(userId).orElseThrow(()->
-//                new UsernameNotFoundException("//User with this id not found -->update skill user service impal"));
-//
-//        Set<Skills> skillsSet=new HashSet<>(skillsRepository.findAllById(skillIds));
-//        users.setSkills(skillsSet);
-//        userRepository.save(users);
-//
-//        return UserMapper.toResponse(users);
+        UUID userId=authserviceImpal.getCurrentUserId();
+        Users users=userRepository.findById(userId).orElseThrow(()->
+                new UsernameNotFoundException("//User with this id not found -->update skill user service impal"));
 
-        return RecruiterResponseDto.builder()
-                .email("").build();
+        Set<Skills> skillsSet=new HashSet<>(skillsRepository.findAllById(skillIds));
+        users.setSkills(skillsSet);
+        userRepository.save(users);
+
+        return UserMapper.toSkillsResponce(users);
+
+
+    }
+
+    @Override
+    public List<SkillsResponseDto> getAllSkills() {
+        return skillsRepository.findAll().stream().map(
+                skills -> new SkillsResponseDto(skills.getId(),skills.getName())
+
+        ).toList();
     }
 
 

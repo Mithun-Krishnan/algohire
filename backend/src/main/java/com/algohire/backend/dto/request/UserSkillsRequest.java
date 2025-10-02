@@ -1,4 +1,4 @@
-package com.algohire.backend.controller;
+package com.algohire.backend.dto.request;
 
 import lombok.Data;
 
