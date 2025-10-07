@@ -42,4 +42,21 @@ public class UserMapper {
                         .collect(Collectors.toSet()))
                 .build();
     }
+
+    public static CompanyResponseDto toCompanyDto(Company company) {
+        return CompanyResponseDto.builder().build().builder()
+                .id(company.getId())
+                .name(company.getName())
+                .email(company.getEmail())
+                .website(company.getWebsite())
+                .address(company.getAddress())
+                .phone(company.getPhone())
+                .about(company.getAbout())
+                .size(company.getSize())
+                .logo(company.getLogo())
+                .createdById(company.getCreatedBy() != null ? company.getCreatedBy().getId() : null)
+                .createdByEmail(company.getCreatedBy() != null ? company.getCreatedBy().getEmail() : null)
+                .build();
+    }
+
 }

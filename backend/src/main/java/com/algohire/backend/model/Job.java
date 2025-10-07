@@ -75,7 +75,7 @@ public class Job extends Auditable{
     private JobCategory jobCategory;
 
 
-    //using Auditble for thees 
+//    using Auditble for thees
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)

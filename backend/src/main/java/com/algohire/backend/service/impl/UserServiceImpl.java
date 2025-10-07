@@ -1,13 +1,9 @@
 package com.algohire.backend.service.impl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.algohire.backend.dto.response.SkillsResponseDto;
-import com.algohire.backend.dto.response.UserResponseSkills;
+import com.algohire.backend.dto.response.*;
 import com.algohire.backend.mapper.UserMapper;
 import com.algohire.backend.model.Skills;
 import com.algohire.backend.repository.SkillsRepository;
@@ -15,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.algohire.backend.dto.response.UserResponse;
 import com.algohire.backend.model.Users;
 import com.algohire.backend.repository.CompanyRepository;
 import com.algohire.backend.repository.RoleRepository;
@@ -77,6 +72,34 @@ public class UserServiceImpl implements UserService{
                 skills -> new SkillsResponseDto(skills.getId(),skills.getName())
 
         ).toList();
+    }
+
+    @Override
+    public ProfileResponseDto getProfile() {
+        UUID userId=authserviceImpal.getCurrentUserId();
+        Users users=userRepository.findById(userId).orElseThrow(
+                ()-> new UsernameNotFoundException("//user with id not fount"+userId)
+        );
+
+        return ProfileResponseDto.builder()
+                .id(users.getId())  // UUID of the user
+                .userName(users.getUsername()) // username
+                .email(users.getEmail())       // email
+                .role(users.getRole().getRole().name())  // assuming role is Enum
+                .phone(users.getPhone())       // phone number
+                .profilePicUrl(users.getProfilePicUrl()) // profile picture link
+                .resumeUrl(users.getResumeUrl())         // resume file link
+                .description(users.getDescription())     // user bio/summary
+                .isActive(users.isActive())
+                .skills(users.getSkills() !=null
+                ? users.getSkills().stream().map(Skills::getName)
+                        .collect(Collectors.toSet()) : Collections.EMPTY_SET)// active flag
+                .lastLogin(users.getLastLogin())
+                .company(users.getCompany() !=null
+                        ? UserMapper.toCompanyDto(users.getCompany())
+                        : null).build();
+
+
     }
 
 

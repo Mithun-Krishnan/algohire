@@ -1,7 +1,9 @@
 package com.algohire.backend.dto.request;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+import com.algohire.backend.enums.JobStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +34,11 @@ public class JobRequstDto {
     @Future(message = "Deadline must be in the future")
     private LocalDateTime deadline;
 
+    private JobStatus jobStatus;
+
+    @NotNull
+    private UUID userId;
+
     @NotNull(message = "Job category ID is required")
-    private Long jobCategoryId;
+    private UUID jobCategoryId;
 }

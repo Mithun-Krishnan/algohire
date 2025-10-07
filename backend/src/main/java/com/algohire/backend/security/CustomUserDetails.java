@@ -1,5 +1,6 @@
 package com.algohire.backend.security;
 
+import com.algohire.backend.model.Role;
 import com.algohire.backend.model.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,11 +17,13 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private UUID id;
 
+
     Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Users user) {
-        this.userName=user.getUsername();
+        this.userName=user.getEmail();
         this.id=user.getId();
+
         this.password=user.getPassword();
 
         List<GrantedAuthority> auths=new ArrayList<>();
@@ -38,6 +41,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+
         return authorities;
     }
 

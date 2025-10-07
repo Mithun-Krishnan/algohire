@@ -6,6 +6,7 @@ import com.algohire.backend.dto.response.RecruiterResponseDto;
 import com.algohire.backend.dto.response.UserResponse;
 import com.algohire.backend.exception.TokenNotFoundException;
 import com.algohire.backend.model.RefreshToken;
+import com.algohire.backend.service.CustomUserDetailsService;
 import com.algohire.backend.service.JwtService;
 import com.algohire.backend.service.RefreshTokenService;
 import com.algohire.backend.service.impl.AuthserviceImpal;
@@ -17,12 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth/v1")
@@ -34,12 +38,14 @@ public class AuthControler {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     private final AuthserviceImpal authserviceImpal;
+    private final CustomUserDetailsService customUserDetailsService;
 
         @PostMapping("/candidate/register")
     public ResponseEntity<JwtResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto){
 
             UserResponse userResponse=authserviceImpal.registerCandidate(userRequestDto);
-            String jwt=jwtService.generateToken(userResponse.getEmail());
+            UserDetails userDetails=customUserDetailsService.loadUserByUsername(userResponse.getEmail());
+            String jwt=jwtService.generateToken(userDetails);
            RefreshToken refreshToken=refreshTokenService.createRefreshToken(userResponse.getEmail());
 
             return ResponseEntity.ok(JwtResponseDto.builder()
@@ -62,7 +68,8 @@ public class AuthControler {
     public ResponseEntity<JwtResponseDto> recuiterRegisterNewCompany(@Valid @RequestBody RecruiterNewCompanyRequestDto recruiterRequestDto){
         RecruiterResponseDto response=authserviceImpal.recruiterNewCompanyRegister(recruiterRequestDto);
 
-        String jwt=jwtService.generateToken(response.getEmail());
+        UserDetails userDetails=customUserDetailsService.loadUserByUsername(response.getEmail());
+        String jwt=jwtService.generateToken(userDetails);
         RefreshToken refreshToken=refreshTokenService.createRefreshToken(response.getEmail());
 
         return ResponseEntity.ok(JwtResponseDto.builder()
@@ -74,7 +81,8 @@ public class AuthControler {
     @PostMapping("/recruiter/registerExistingcompany")
     public ResponseEntity<JwtResponseDto> recruiterRegisterExistCompany(@Valid @RequestBody RecruiterExistCompanyRequstDto recruiterExistCompanyRequstDto){
         RecruiterResponseDto response=authserviceImpal.recuiterExistingCompany(recruiterExistCompanyRequstDto);
-        String jwt=jwtService.generateToken(response.getEmail());
+        UserDetails userDetails=customUserDetailsService.loadUserByUsername(response.getEmail());
+        String jwt=jwtService.generateToken(userDetails);
         RefreshToken refreshToken=refreshTokenService.createRefreshToken(response.getEmail());
 
         return ResponseEntity.ok(JwtResponseDto.builder()
@@ -85,11 +93,11 @@ public class AuthControler {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> login(@Valid @RequestBody LoginRequstDto requst){
-        Authentication authentication=authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requst.getEmail(),requst.getPassword())
-        );
 
-        if(authentication.isAuthenticated()){
+            try {
+                Authentication authentication=authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(requst.getEmail(),requst.getPassword())
+                );
             UserDetails userDetails=(UserDetails) authentication.getPrincipal();
             String accessToken=jwtService.generateToken(userDetails);
             RefreshToken refreshToken=refreshTokenService.createRefreshToken(userDetails.getUsername());
@@ -98,9 +106,18 @@ public class AuthControler {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken.getToken())
                     .build());
-        }
+            }
+            catch (AuthenticationException ex){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(null);
+            }
 
-        throw new UsernameNotFoundException("invalid user or password");
+
+
+
+
+
+//        throw new UsernameNotFoundException("invalid user or password");
     }
 
     @PostMapping("/logout")
@@ -121,7 +138,9 @@ public class AuthControler {
         // validate refresh token (throws exception if expired and deletes it)
         refreshTokenService.validateToken(token);
 
-        String newAccessToken = jwtService.generateToken(token.getUsers().getEmail());
+        UserDetails userDetails=customUserDetailsService.loadUserByUsername(token.getUsers().getEmail());
+
+        String newAccessToken = jwtService.generateToken(userDetails);
 
         return ResponseEntity.ok(JwtResponseDto.builder()
                 .accessToken(newAccessToken)

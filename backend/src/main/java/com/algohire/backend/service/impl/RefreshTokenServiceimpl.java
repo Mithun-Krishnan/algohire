@@ -7,6 +7,7 @@ import com.algohire.backend.repository.RefreshTokenRepository;
 import com.algohire.backend.repository.UserRepository;
 import com.algohire.backend.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,19 +25,30 @@ public class RefreshTokenServiceimpl implements RefreshTokenService {
 
     @Override
     public RefreshToken createRefreshToken(Users users) {
-        RefreshToken token=RefreshToken.builder()
-                .users(users)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(LocalDateTime.now().plusDays(20))
-                .build();
-        return refreshTokenRepository.save(token);
+
+        Optional<RefreshToken> existingTokenOpt=refreshTokenRepository.findByUsers(users);
+        if(existingTokenOpt.isPresent()){
+            RefreshToken existingToken = existingTokenOpt.get();
+            existingToken.setToken(UUID.randomUUID().toString());
+            existingToken.setExpiryDate(LocalDateTime.now().plusDays(20));
+            return refreshTokenRepository.save(existingToken);
+        }
+        else {
+            RefreshToken token = RefreshToken.builder()
+                    .users(users)
+                    .token(UUID.randomUUID().toString())
+                    .expiryDate(LocalDateTime.now().plusDays(20))
+                    .build();
+            return refreshTokenRepository.save(token);
+        }
     }
 
     @Override
     public RefreshToken createRefreshToken(String email) {
-        Users users=userRepository.findByEmail(email);
+        Users users=userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("//user not found in email"+email));
 
-        if(users==null) throw new RuntimeException("no user found on the email");
+//        if(users==null) throw new RuntimeException("no user found on the email");
 
         return createRefreshToken(users);
 

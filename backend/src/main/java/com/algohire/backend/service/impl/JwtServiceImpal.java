@@ -1,13 +1,19 @@
 package com.algohire.backend.service.impl;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -22,17 +28,28 @@ public class JwtServiceImpal implements JwtService{
     @Value("${jwt.secret}")
     private  String SECRET;
 
+
+    private Key key;
+
+    @PostConstruct
+    public void init(){
+        this.key= Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    }
+
+//    @Override
+//    public String generateToken(String emial) {
+//        Map<String,Object> claims=new HashMap<>();
+//        return createToken(claims,emial);
+//
+//    }
+
     @Override
     public String generateToken(UserDetails userDetails) {
         Map<String,Object> claims=new HashMap<>();
+        List<String> roles=userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                        .toList();
+        claims.put("roles",roles);
         return createToken(claims,userDetails.getUsername());
-         
-    }
-
-    @Override
-    public String generateToken(String email) {
-        Map<String,Object> claims=new HashMap<>();
-        return createToken(claims,email);
 
     }
 
@@ -44,7 +61,7 @@ public class JwtServiceImpal implements JwtService{
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*60*10))
-                .signWith(SignatureAlgorithm.HS256,SECRET)
+                .signWith(key,SignatureAlgorithm.HS256)
                 .compact();
     }
     @Override
@@ -59,10 +76,14 @@ public class JwtServiceImpal implements JwtService{
          
     }
 
+    public List<String> extractRoles(String token){
+        return extractClaim(token,claims -> (List<String>) claims.get("roles"));
+    }
+
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
          final Claims claims=Jwts.parser()
-                 .setSigningKey(SECRET)
+                 .setSigningKey(key)
                  .parseClaimsJws(token)
                  .getBody();
          return claimsResolver.apply(claims);

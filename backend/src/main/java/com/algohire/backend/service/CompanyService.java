@@ -1,11 +1,11 @@
 package com.algohire.backend.service;
 
 import com.algohire.backend.dto.request.CompanyRequstDto;
-import com.algohire.backend.dto.response.CompanyResponseDto;
+import com.algohire.backend.dto.response.CompanyExistResponseDto;
 
 
 public interface CompanyService {
-    CompanyResponseDto checkCompany(String name,String email);
+    CompanyExistResponseDto checkCompany(String name, String email);
 
-    CompanyResponseDto createCompany(CompanyRequstDto requst);
+    CompanyExistResponseDto createCompany(CompanyRequstDto requst);
 }

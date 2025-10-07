@@ -1,5 +1,6 @@
 package com.algohire.backend.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,6 @@ public interface  UserRepository extends JpaRepository<Users, UUID> {
 
     boolean existsByEmail(String email);
     Users findByUsername(String userName);
-    Users findByEmail(String email);
+    Optional <Users> findByEmail(String email);
     
 }

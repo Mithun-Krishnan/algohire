@@ -1,9 +1,14 @@
 package com.algohire.backend.dto.response;
 
+import lombok.Builder;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+@Data
+@Builder
 public class ProfileResponseDto {
     private UUID id;
     private String userName;

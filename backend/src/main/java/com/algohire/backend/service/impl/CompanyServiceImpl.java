@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.algohire.backend.dto.request.CompanyRequstDto;
-import com.algohire.backend.dto.response.CompanyResponseDto;
+import com.algohire.backend.dto.response.CompanyExistResponseDto;
 import com.algohire.backend.model.Company;
 import com.algohire.backend.repository.CompanyRepository;
 import com.algohire.backend.service.CompanyService;
@@ -20,11 +20,11 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public CompanyResponseDto checkCompany(String name,String email) {
+    public CompanyExistResponseDto checkCompany(String name, String email) {
        Optional<Company> optionalCompany=companyRepository.findByNameIgnoreCaseAndEmailIgnoreCase(name,email);
         if(optionalCompany.isPresent()){
             Company company=optionalCompany.get();
-            return CompanyResponseDto.builder()
+            return CompanyExistResponseDto.builder()
                     .exist(true)
                     .id(company.getId())
                     .message("company exist")
@@ -32,7 +32,7 @@ public class CompanyServiceImpl implements CompanyService {
        
                 }
 
-        return CompanyResponseDto.builder()
+        return CompanyExistResponseDto.builder()
         .exist(false)
         .id(null)
         .message("company dosent exist")
@@ -41,14 +41,14 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public CompanyResponseDto createCompany(CompanyRequstDto requst) {
+    public CompanyExistResponseDto createCompany(CompanyRequstDto requst) {
 
        Optional<Company> exist=companyRepository.findByNameIgnoreCaseAndEmailIgnoreCase(requst.getName(), requst.getEmail());
 
        if(exist.isPresent()){
 
         Company company=exist.get();
-        return CompanyResponseDto.builder()
+        return CompanyExistResponseDto.builder()
                 .exist(true)
                 .id(company.getId())
                 .message("company exist")
@@ -68,7 +68,7 @@ public class CompanyServiceImpl implements CompanyService {
 
        Company saved=companyRepository.save(company);
 
-       return CompanyResponseDto.builder()
+       return CompanyExistResponseDto.builder()
             .exist(true)
             .id(saved.getId())
             .message("creted susscfully")

@@ -32,11 +32,24 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->auth
-                        .requestMatchers("/auth/v1/login", "/auth/v1/refreshToken", "/auth/v1/candidate/register").permitAll()
+                        .requestMatchers("/auth/v1/login",
+                                "/auth/v1/refreshToken",
+                                "/auth/v1/candidate/register",
+                                "/auth/v1/recruiter/registerExistingcompany",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/webjars/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/candidate/**").hasRole("CANDIDATE")
                         .requestMatchers("/auth/v1/refresh").permitAll()
-                        .requestMatchers("/api/users/allskills").permitAll()
+                        .requestMatchers("/api/users/skills").permitAll()
+                        .requestMatchers("/job/{jobId}",
+                                                    "/job/serchjob").permitAll()
+                        .requestMatchers("/api/users/me/skills").hasRole("CANDIDATE")
+                        .requestMatchers("/job/create",
+                                                    "/job/recruter/jobs",
+                                                    "/job/recruter/update/{jobid}",
+                                                    "/job/recruter/delete/{jobId}").hasRole("RECRUITER")
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

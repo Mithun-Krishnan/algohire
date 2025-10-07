@@ -40,7 +40,7 @@ public class Application extends Auditable{
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="user_id",nullable=false)
-    private Users userId;
+    private Users users;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="job_id" ,nullable=false)

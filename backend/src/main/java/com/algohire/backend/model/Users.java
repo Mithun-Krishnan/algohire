@@ -89,7 +89,7 @@ public class Users extends Auditable{
     @JoinColumn(name = "company_id",nullable=true)
     private Company company;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional=true)
+    @ManyToOne(fetch = FetchType.EAGER,optional=true)
     @JoinColumn(name = "role_id", nullable = true)
     private Role role;
 

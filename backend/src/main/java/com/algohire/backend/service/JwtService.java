@@ -11,7 +11,7 @@ import io.jsonwebtoken.Claims;
 public interface JwtService {
      public String generateToken(UserDetails userDetails);
 
-     String generateToken(String email);
+//     String generateToken(String email);
 
      public String createToken(Map<String, Object> claims, String subject);
      public Date extractExpiration(String token);
