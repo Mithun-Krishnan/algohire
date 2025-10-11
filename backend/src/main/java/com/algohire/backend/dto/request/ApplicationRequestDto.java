@@ -9,8 +9,6 @@ import java.util.UUID;
 @Data
 
 public class ApplicationRequestDto {
-    @NotNull(message = "User ID is required")
-    private UUID userId;
 
     @NotNull(message = "Job ID is required")
     private UUID jobId;

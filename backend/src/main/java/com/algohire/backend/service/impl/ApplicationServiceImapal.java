@@ -1,7 +1,9 @@
 package com.algohire.backend.service.impl;
 
 import com.algohire.backend.dto.request.ApplicationRequestDto;
+import com.algohire.backend.dto.request.ApplicationUpdateRequestDto;
 import com.algohire.backend.dto.response.ApplicationResponseDto;
+import com.algohire.backend.enums.ApplicationStatus;
 import com.algohire.backend.exception.ResourceNotFoundException;
 import com.algohire.backend.exception.UnauthorizedActionException;
 import com.algohire.backend.mapper.ApplicationMapper;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,36 +45,75 @@ public class ApplicationServiceImapal implements ApplicationService {
         Users users=userRepository.findById(userId).orElseThrow(
                 ()->new UnauthorizedActionException("user not found "+userId));
 
-        if(applicationRepository.existsByUserIdIdAndJobIdId(userId,jobId)){
+        if(applicationRepository.existsByUsers_IdAndJobId_Id(userId,jobId)){
             throw  new IllegalArgumentException("allredy aplied");
         }
 
-        return ApplicationMapper.toEntity(coverLetter,users,job);
+        Application app=ApplicationMapper.toEntity(coverLetter,users,job);
+        Application saved=applicationRepository.save(app);
+        return saved;
     }
 
     @Override
-    public List<Application> viewApplication(UUID userId,UUID jobid) {
-        return List.of();
+    public List<Application> viewApplication(UUID userId) {
+        return applicationRepository.findByUsers_Id(userId);
     }
 
     @Override
-    public List<ApplicationResponseDto> viewApplicationFromReq(ApplicationRequestDto request) {
+    public List<ApplicationResponseDto> viewApplicationFromReq() {
         UUID userid=authserviceImpal.getCurrentUserId();
-        
+        return viewApplication(userid).stream()
+                .map(ApplicationMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
     public List<Application> viewApplicationRecruter(UUID jobid, UUID userid) {
-        return List.of();
+        Job job=jobRepository.findById(jobid).orElseThrow(()->new ResourceNotFoundException("no job with id"+jobid));
+
+        if(!job.getCreatedBy().getId().equals(userid)){
+            throw new UnauthorizedActionException("you cant see thees job");
+        }
+
+        return applicationRepository.findByJobId_Id(jobid);
     }
 
     @Override
     public List<ApplicationResponseDto> viewApplicationRecruterReq(UUID jobid) {
-        return List.of();
+        UUID userId=authserviceImpal.getCurrentUserId();
+        return viewApplicationRecruter(jobid,userId).stream()
+                .map(ApplicationMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public ApplicationResponseDto updateApplication(ApplicationRequestDto request) {
-        return null;
+    public ApplicationResponseDto updateApplication(ApplicationUpdateRequestDto request) {
+        UUID userid = authserviceImpal.getCurrentUserId();
+        // 1. Fetch the application
+        Application app = applicationRepository.findById(request.getApplicationId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No application found with ID: " + request.getApplicationId()));
+
+        // 2. Fetch the job and ensure recruiter owns it
+        Job job = app.getJobId();
+        if (!userid.equals(job.getCreatedBy().getId())) {
+            throw new UnauthorizedActionException("You cannot update applications for jobs you don't own");
+        }
+
+        // 3. Validate that the status is not null
+        if (request.getApplicationStatus() == null) {
+            throw new IllegalArgumentException("Application status must be provided");
+        }
+
+        // 4. Update the status
+        app.setApplicationStatus(request.getApplicationStatus());
+
+        if(app.getApplicationStatus()==ApplicationStatus.SHORTLISTED){
+            app.setShortListed(true);
+        }
+
+        // 5. Save the updated application
+        applicationRepository.save(app);
+
+        // 6. Return response DTO
+        return ApplicationMapper.toResponse(app);
     }
 }

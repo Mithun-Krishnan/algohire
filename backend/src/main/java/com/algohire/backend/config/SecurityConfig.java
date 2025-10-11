@@ -50,6 +50,11 @@ public class SecurityConfig {
                                                     "/job/recruter/jobs",
                                                     "/job/recruter/update/{jobid}",
                                                     "/job/recruter/delete/{jobId}").hasRole("RECRUITER")
+                        .requestMatchers("/application/create").hasRole("CANDIDATE")
+                        .requestMatchers("/application/candidate/**").hasRole("CANDIDATE")
+                        .requestMatchers("/application/recruiter/**").hasRole("RECRUITER")
+                        .requestMatchers("/api/uploadToVm","/api/resume/get/{userId}").permitAll()
+
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

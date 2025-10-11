@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,10 +33,10 @@ import lombok.Setter;
 @Table(name="application"
 )
 public class Application extends Auditable{
-    
+
     @Id
     @GeneratedValue
-    @Column(columnDefinition="UUID")
+    @Column(name = "id", columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne(fetch=FetchType.LAZY)
@@ -47,7 +48,7 @@ public class Application extends Auditable{
     private Job jobId;
 
     @Enumerated(EnumType.STRING)
-    @NotBlank
+    @NotNull
     @Column(name="application_status",nullable=false)
     private ApplicationStatus applicationStatus;
 

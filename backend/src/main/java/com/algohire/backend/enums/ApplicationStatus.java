@@ -2,7 +2,7 @@ package com.algohire.backend.enums;
 
 public enum ApplicationStatus {
     APPLIED,         // Candidate submitted application
-    UNDER_REVIEW,    // HR or system is screening
+    SHORTLISTED,    // HR or system is screening
     INTERVIEWING,    // Candidate is being interviewed
     OFFERED,         // Offer made
     ACCEPTED,        // Candidate accepted the offer
