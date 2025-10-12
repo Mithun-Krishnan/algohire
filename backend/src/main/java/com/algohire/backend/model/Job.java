@@ -23,6 +23,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "jobs") 
@@ -40,57 +42,66 @@ public class Job extends Auditable{
 
    
     @Column(name = "job_title", nullable = false)
-    private String jobTitle;
+    private String title;
 
      
     @Column(name = "job_description", nullable = false, columnDefinition = "TEXT")
-    private String jobDescription;
+    private String description;
 
      
     @Column(nullable = false)
     private String city;
 
      
-    @Column(nullable = false)
-    private String state;
+//    @Column(nullable = false)
+//    private String state;
 
      
-    @Column(name = "address", nullable = false)
-    private String address;
+
      
     @Column(nullable = false)
     private String salary;
 
     
-    @Column(name = "deadline", nullable = false)
-    private LocalDateTime deadLine;
-
-    @Enumerated(EnumType.STRING)
-     
-    @Column(name = "job_status", nullable = false)
-    private JobStatus jobStatus;
-    
-    @ManyToOne(fetch=FetchType.LAZY,optional=false)
-    @JoinColumn(name="job_category",nullable=false)
-    private JobCategory jobCategory;
-
-
-//    using Auditble for thees
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private Users createdBy;
 
+//    @Column(name = "deadline", nullable = false)
+//    private LocalDateTime deadLine;
+
+    @Column
+    private String skills;
+
+    @Column
+    private String experience;
+
+//    @Enumerated(EnumType.STRING)
+//
+//    @Column(name = "job_status", nullable = false)
+//    private JobStatus jobStatus;
+
+//    @ManyToOne(fetch=FetchType.LAZY,optional=false)
+//    @JoinColumn(name="job_category",nullable=false)
+//    private JobCategory jobCategory;
+
+    //    @Column(name = "address", nullable = false)
+//    private String address;
+
+
+//    using Auditble for thees
 
 
 
-    // @CreationTimestamp
-    // @Column(name = "created_at", updatable = false)
-    // private LocalDateTime createdAt;
 
-    // @UpdateTimestamp
-    // @Column(name = "updated_at")
-    // private LocalDateTime updatedAt;
+
+     @CreationTimestamp
+     @Column(name = "created_at", updatable = false)
+     private LocalDateTime createdAt;
+
+     @UpdateTimestamp
+     @Column(name = "updated_at")
+     private LocalDateTime updatedAt;
 
     
 

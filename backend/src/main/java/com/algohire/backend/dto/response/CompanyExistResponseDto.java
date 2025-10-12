@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class CompanyExistResponseDto {
     private boolean exist;
     private UUID id;
-    private String message;
+    private String name;
+    private String email;
    
 
    

@@ -13,11 +13,12 @@ public class JobDetailsResponseDto {
     private UUID jobId;
     private String title;
     private String description;
-    private String location;
+    private String city;
+    private String state;
     private String salary;
-    private LocalDateTime deadline;
-    private String jobstatus;
-    private String category;
+    private LocalDateTime createdAt;
+    private String skills;
+    private String experience;
     private String createdByName;
 
 }

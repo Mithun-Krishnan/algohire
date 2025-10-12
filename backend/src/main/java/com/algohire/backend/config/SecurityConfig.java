@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/application/candidate/**").hasRole("CANDIDATE")
                         .requestMatchers("/application/recruiter/**").hasRole("RECRUITER")
                         .requestMatchers("/api/uploadToVm","/api/resume/get/{userId}").permitAll()
-
+                        .requestMatchers("/api/company/search/{query}").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

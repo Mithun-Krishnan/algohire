@@ -27,5 +27,5 @@ public class RecruiterExistCompanyRequstDto {
     @NotBlank(message = "Password is required")
     private String password;
 
-    private UUID companyId;
+    private UUID company;
 }

@@ -12,19 +12,18 @@ import java.util.Optional;
 
 public class JobMapper {
 
-    public static Job jobBuilder(JobRequstDto requstDto){
+    public static Job jobBuilder(JobRequstDto requestDto){
 
 
-        JobStatus jobStatus=requstDto.getJobStatus()!= null?requstDto.getJobStatus(): JobStatus.OPEN;
+//        JobStatus jobStatus=requstDto.getJobStatus()!= null?requstDto.getJobStatus(): JobStatus.OPEN;
         Job job=Job.builder()
-                .jobTitle(requstDto.getTitle())
-                .jobDescription(requstDto.getDescription())
-                .city(requstDto.getCity())
-                .jobStatus(jobStatus)
-                .state(requstDto.getState())
-                .address(requstDto.getAddress())
-                .salary(requstDto.getSalary())
-                .deadLine(requstDto.getDeadline())
+                .title(requestDto.getTitle())
+                .description(requestDto.getDescription())
+                .city(requestDto.getCity())
+                .salary(requestDto.getSalary())
+                .skills(requestDto.getSkills())          // optional
+                .experience(requestDto.getExperience())  // optional
+                .isDeleted(false)                        // default value
                 .build();
 
         return job;
@@ -33,10 +32,10 @@ public class JobMapper {
     public static JobSummeryResponseDto toJobSummuryResponse (Job job){
         return JobSummeryResponseDto.builder()
                 .jobId(job.getId())
-                .category(job.getJobCategory().getCategory())
-                .title(job.getJobTitle())
+                .title(job.getTitle())
                 .location(job.getCity())
-                .description(job.getJobDescription())
+                .description(job.getDescription())
+                .dateTime(job.getCreatedAt())
                 .build();
     }
 
@@ -44,13 +43,14 @@ public class JobMapper {
         Job job=jobOpt.orElseThrow(()->new UsernameNotFoundException("//no user found"));
         return JobDetailsResponseDto.builder()
                 .jobId(job.getId())
-                .jobstatus(job.getJobStatus().name())
-                .title(job.getJobTitle())
+                .title(job.getTitle())
+                .description(job.getDescription())
+                .city(job.getCity())
                 .salary(job.getSalary())
-                .description(job.getJobDescription())
-                .location(job.getCity())
+                .createdAt(job.getCreatedAt())
+                .skills(job.getSkills())
+                .experience(job.getExperience())
                 .createdByName(jobOwner)
-                .category(job.getJobCategory().getCategory())
                 .build();
     }
 }

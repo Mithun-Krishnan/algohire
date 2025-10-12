@@ -7,7 +7,6 @@ import com.algohire.backend.exception.ResourceNotFoundException;
 import com.algohire.backend.exception.UnauthorizedActionException;
 import com.algohire.backend.mapper.JobMapper;
 import com.algohire.backend.model.Job;
-import com.algohire.backend.model.JobCategory;
 import com.algohire.backend.model.Users;
 import com.algohire.backend.repository.JobRepository;
 import com.algohire.backend.repository.JobcategoryRepository;
@@ -44,12 +43,15 @@ public class JobServiceImapal implements JobService {
 
     public JobSummeryResponseDto createJobfromReq(JobRequstDto requst){
         Job job= JobMapper.jobBuilder(requst);
-        System.out.println("JobCategoryId from request: " + requst.getJobCategoryId());
+//        System.out.println("JobCategoryId from request: " + requst.getJobCategoryId());
 
-        JobCategory category = jobcategoryRepository.findById(requst.getJobCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Job category not found"));
+        // due to some resne removing the jobcat
+
+//        JobCategory category = jobcategoryRepository.findById(requst.getJobCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Job category not found"));
 
         UUID jobCreatorId=authService.getCurrentUserId();
+        System.out.println(jobCreatorId);
 
         Users recruiter = userRepository.findById(jobCreatorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found"));
@@ -57,7 +59,7 @@ public class JobServiceImapal implements JobService {
 
 
 
-        job.setJobCategory(category);
+//        job.setJobCategory(category);
         job.setCreatedBy(recruiter);
         Job savedJob=addJob(job,jobCreatorId);
 
@@ -69,7 +71,7 @@ public class JobServiceImapal implements JobService {
     public List<JobSummeryResponseDto> viewJob(String city,String keyword) {
       if(city==null)city="";
       if(keyword==null)keyword="";
-      List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndJobTitleContainingIgnoreCase(city, keyword);
+      List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCase(city, keyword);
       return jobs.stream()
               .filter(job -> !job.isDeleted())
               .map(job -> JobMapper.toJobSummuryResponse(job))
@@ -106,20 +108,18 @@ public class JobServiceImapal implements JobService {
             throw new UnauthorizedActionException("not authorized for update job");
         }
 
-        if (request.getTitle() != null) existJob.setJobTitle(request.getTitle());
-        if (request.getDescription() != null) existJob.setJobDescription(request.getDescription());
+        if (request.getTitle() != null) existJob.setTitle(request.getTitle());
+        if (request.getDescription() != null) existJob.setDescription(request.getDescription());
         if (request.getCity() != null) existJob.setCity(request.getCity());
-        if (request.getState() != null) existJob.setState(request.getState());
-        if (request.getAddress() != null) existJob.setAddress(request.getAddress());
         if (request.getSalary() != null) existJob.setSalary(request.getSalary());
-        if (request.getDeadline() != null) existJob.setDeadLine(request.getDeadline());
-        if (request.getJobStatus() != null) existJob.setJobStatus(request.getJobStatus());
+        if (request.getSkills() != null) existJob.setSkills(request.getSkills());
+        if (request.getExperience() != null) existJob.setExperience(request.getExperience());
 
-        if (request.getJobCategoryId() != null) {
-            JobCategory category = jobcategoryRepository.findById(request.getJobCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Job category not found"));
-            existJob.setJobCategory(category);
-        }
+//        if (request.getJobCategoryId() != null) {
+//            JobCategory category = jobcategoryRepository.findById(request.getJobCategoryId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Job category not found"));
+//            existJob.setJobCategory(category);
+//        }
 
 
         Job updatedJob = jobRepository.save(existJob);

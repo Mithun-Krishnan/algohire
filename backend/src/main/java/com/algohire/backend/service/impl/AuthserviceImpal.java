@@ -105,7 +105,7 @@ public class AuthserviceImpal implements AuthService {
 
 
 
-        Company company=companyRepository.findByNameIgnoreCaseAndEmailIgnoreCase(requst.getCompanyName(), requst.getCompanyEmail())
+        Company company=companyRepository.findByNameIgnoreCase(requst.getCompanyName())
                 .orElseGet(()->{
                     Company newCompany=Company.builder()
                             .name(requst.getCompanyName())
@@ -154,7 +154,9 @@ public class AuthserviceImpal implements AuthService {
         Role role=roleRepository.findByRole(RoleType.RECRUITER)
                 .orElseThrow(()->new RuntimeException("invalid id"));
 
-        Company company=companyRepository.findById(requst.getCompanyId())
+        System.out.println(requst.getCompany());
+        UUID companyId = UUID.fromString(String.valueOf(requst.getCompany()));
+        Company company=companyRepository.findById(companyId)
                 .orElseThrow(()-> new RuntimeException("invalid company id"));
 
         Users user=Users.builder()

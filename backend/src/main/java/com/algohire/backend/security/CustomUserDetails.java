@@ -16,6 +16,7 @@ public class CustomUserDetails implements UserDetails {
     private String userName;
     private String password;
     private UUID id;
+    private String roles;
 
 
     Collection<? extends GrantedAuthority> authorities;
@@ -23,7 +24,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(Users user) {
         this.userName=user.getEmail();
         this.id=user.getId();
-
+        this.roles=user.getRole().getRole().name();
         this.password=user.getPassword();
 
         List<GrantedAuthority> auths=new ArrayList<>();
@@ -48,6 +49,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public String getRole(){
+        return roles;
     }
 
     @Override

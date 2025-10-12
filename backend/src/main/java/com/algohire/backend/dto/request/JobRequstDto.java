@@ -12,33 +12,46 @@ import lombok.Data;
 @Data
 public class JobRequstDto {
 
-    @NotBlank(message = "Title is required")
+    @NotBlank(message = "Job title is required")
     private String title;
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Job description is required")
     private String description;
 
     @NotBlank(message = "City is required")
     private String city;
 
-    @NotBlank(message = "State is required")
-    private String state;
-
-    @NotBlank(message = "Address is required")
-    private String address;
+//    @NotBlank(message = "State is required")
+//    private String state;
 
     @NotBlank(message = "Salary is required")
     private String salary;
 
-    @NotNull(message = "Deadline is required")
-    @Future(message = "Deadline must be in the future")
-    private LocalDateTime deadline;
+    private String skills; // optional
 
-    private JobStatus jobStatus;
+    private String experience; // optional
 
-    @NotNull
-    private UUID userId;
 
-    @NotNull(message = "Job category ID is required")
-    private UUID jobCategoryId;
+
+//    @NotNull(message = "Deadline is required")
+//    private LocalDateTime deadLine;
+
+
+//    private String state;
+//
+//
+//    private String address;
+
+
+//    @NotNull(message = "Deadline is required")
+//    @Future(message = "Deadline must be in the future")
+//    private LocalDateTime deadline;
+
+//    private JobStatus jobStatus;
+
+//    @NotNull
+//    private UUID userId;
+
+//    @NotNull(message = "Job category ID is required")
+//    private UUID jobCategoryId;
 }

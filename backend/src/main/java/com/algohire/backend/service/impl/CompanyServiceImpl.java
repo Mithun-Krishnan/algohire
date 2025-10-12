@@ -1,7 +1,10 @@
 package com.algohire.backend.service.impl;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import com.algohire.backend.dto.response.CompanyResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +23,15 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     @Override
-    public CompanyExistResponseDto checkCompany(String name, String email) {
-       Optional<Company> optionalCompany=companyRepository.findByNameIgnoreCaseAndEmailIgnoreCase(name,email);
+    public CompanyExistResponseDto checkCompany(String name) {
+       Optional<Company> optionalCompany=companyRepository.findByNameIgnoreCase(name);
         if(optionalCompany.isPresent()){
             Company company=optionalCompany.get();
             return CompanyExistResponseDto.builder()
                     .exist(true)
                     .id(company.getId())
-                    .message("company exist")
+                    .name(company.getName())
+                    .email(company.getEmail())
                     .build();
        
                 }
@@ -35,15 +39,30 @@ public class CompanyServiceImpl implements CompanyService {
         return CompanyExistResponseDto.builder()
         .exist(false)
         .id(null)
-        .message("company dosent exist")
+        .name(null).email(null)
         .build();
+    }
+
+    @Override
+    public List<CompanyResponseDto> serchCompany(String name) {
+        List<Company> companies=companyRepository.findAllByNameContainingIgnoreCase(name);
+
+        return companies.stream()
+                .map(company -> CompanyResponseDto.builder()
+                        .id(company.getId())
+                        .name(company.getName())
+                        .email(company.getEmail())
+
+                                .build()
+                        ).collect(Collectors.toList());
+
     }
 
 
     @Override
     public CompanyExistResponseDto createCompany(CompanyRequstDto requst) {
 
-       Optional<Company> exist=companyRepository.findByNameIgnoreCaseAndEmailIgnoreCase(requst.getName(), requst.getEmail());
+       Optional<Company> exist=companyRepository.findByNameIgnoreCase(requst.getName());
 
        if(exist.isPresent()){
 
@@ -51,7 +70,8 @@ public class CompanyServiceImpl implements CompanyService {
         return CompanyExistResponseDto.builder()
                 .exist(true)
                 .id(company.getId())
-                .message("company exist")
+                .name(company.getName())
+
                 .build();
        }
 
@@ -71,7 +91,7 @@ public class CompanyServiceImpl implements CompanyService {
        return CompanyExistResponseDto.builder()
             .exist(true)
             .id(saved.getId())
-            .message("creted susscfully")
+            .name("creted susscfully")
             .build();
     }
     

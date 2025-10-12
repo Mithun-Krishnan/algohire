@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth/v1")
@@ -99,12 +102,16 @@ public class AuthControler {
                         new UsernamePasswordAuthenticationToken(requst.getEmail(),requst.getPassword())
                 );
             UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+
             String accessToken=jwtService.generateToken(userDetails);
             RefreshToken refreshToken=refreshTokenService.createRefreshToken(userDetails.getUsername());
+
+            String role=userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
 
             return ResponseEntity.ok(JwtResponseDto.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken.getToken())
+                            .role(role)
                     .build());
             }
             catch (AuthenticationException ex){
