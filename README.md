@@ -41,5 +41,5 @@ It’s built to simulate a production-grade hiring platform where recruiters can
 
 ---
 
-## 📁 Project Structure
+
 
