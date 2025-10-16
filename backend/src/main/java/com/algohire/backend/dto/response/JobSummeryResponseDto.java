@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -14,4 +15,7 @@ public class JobSummeryResponseDto {
     private String description;
     private String location;
     private LocalDateTime dateTime;
+    private String company;
+    private Set<String> skills;
+    private Integer experince;
 }

@@ -35,12 +35,14 @@ public class UserMapper {
 //    }
 
     public static UserResponseSkills toSkillsResponce(Users users){
-        return UserResponseSkills.builder()
-                .id(users.getId())
-                .name(users.getUsername())
-                .skills(users.getSkills().stream().map(skill->new SkillsResponseDto(skill.getId(), skill.getName()))
-                        .collect(Collectors.toSet()))
-                .build();
+//        return UserResponseSkills.builder()
+//                .id(users.getId())
+//                .name(users.getUsername())
+//                .skills(users.getSkills().stream().map(skill->new SkillsResponseDto(skill.getId(), skill.getName()))
+//                        .collect(Collectors.toSet()))
+//                .build();
+
+        return new UserResponseSkills();
     }
 
     public static CompanyResponseDto toCompanyDto(Company company) {

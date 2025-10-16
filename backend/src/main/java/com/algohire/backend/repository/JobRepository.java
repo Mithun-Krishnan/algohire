@@ -10,7 +10,13 @@ import com.algohire.backend.model.Job;
 
 public interface  JobRepository extends JpaRepository<Job, UUID>{
     public List<Job> findByCreatedBy(Users users);
-    List<Job> findByCityContainingIgnoreCaseAndTitleContainingIgnoreCase(String city, String keyword);
-    
-    
+    List<Job> findByCityContainingIgnoreCaseAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(String city, String keyword);
+
+    // count all active jobs by recruiter/user
+    long countByCreatedById(UUID userId);
+
+    // optional: count jobs by deleted status
+    long countByCreatedByIdAndIsDeleted(UUID userId, boolean isDeleted);
+
+    List<Job> findByCreatedByAndIsDeletedFalseOrderByCreatedAtDesc(Users createdBy);
 }

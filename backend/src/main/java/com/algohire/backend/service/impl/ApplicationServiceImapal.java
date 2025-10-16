@@ -4,10 +4,13 @@ import com.algohire.backend.dto.request.ApplicationRequestDto;
 import com.algohire.backend.dto.request.ApplicationUpdateRequestDto;
 import com.algohire.backend.dto.response.ApplicationResponseDto;
 import com.algohire.backend.enums.ApplicationStatus;
+import com.algohire.backend.exception.AlreadyAppliedException;
 import com.algohire.backend.exception.ResourceNotFoundException;
 import com.algohire.backend.exception.UnauthorizedActionException;
+import com.algohire.backend.exception.UserNotFoundException;
 import com.algohire.backend.mapper.ApplicationMapper;
 import com.algohire.backend.model.Application;
+import com.algohire.backend.model.Company;
 import com.algohire.backend.model.Job;
 import com.algohire.backend.model.Users;
 import com.algohire.backend.repository.ApplicationRepository;
@@ -28,13 +31,19 @@ public class ApplicationServiceImapal implements ApplicationService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
+    private final UserServiceImpl userService;
 
 
     @Override
     public ApplicationResponseDto applyFromReq(ApplicationRequestDto request) {
         UUID userid=authserviceImpal.getCurrentUserId();
+        Job job=jobRepository.findById(request.getJobId()).orElseThrow(
+                ()-> new UserNotFoundException("no job in the id")
+        );
+        String commapny=job.getCreatedBy().getCompany().getName();
+
         Application app=apply(request.getJobId(),userid,request.getCoverLetter());
-        return ApplicationMapper.toResponse(app);
+        return ApplicationMapper.toResponse(app,commapny, 0);
     }
 
     @Override
@@ -46,7 +55,7 @@ public class ApplicationServiceImapal implements ApplicationService {
                 ()->new UnauthorizedActionException("user not found "+userId));
 
         if(applicationRepository.existsByUsers_IdAndJobId_Id(userId,jobId)){
-            throw  new IllegalArgumentException("allredy aplied");
+            throw  new AlreadyAppliedException("allredy aplied");
         }
 
         Application app=ApplicationMapper.toEntity(coverLetter,users,job);
@@ -56,14 +65,19 @@ public class ApplicationServiceImapal implements ApplicationService {
 
     @Override
     public List<Application> viewApplication(UUID userId) {
-        return applicationRepository.findByUsers_Id(userId);
+        return applicationRepository.findByUsers_IdOrderByUpdatedAtDesc(userId);
     }
 
     @Override
     public List<ApplicationResponseDto> viewApplicationFromReq() {
         UUID userid=authserviceImpal.getCurrentUserId();
         return viewApplication(userid).stream()
-                .map(ApplicationMapper::toResponse).collect(Collectors.toList());
+                .map(application -> {
+                    Company cm=application.getJobId().getCreatedBy().getCompany();
+                    String compny=cm.getName();
+                    String location=application.getJobId().getCreatedBy().getCity();
+                    return ApplicationMapper.toResponse(application,compny, 0);
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -74,6 +88,8 @@ public class ApplicationServiceImapal implements ApplicationService {
             throw new UnauthorizedActionException("you cant see thees job");
         }
 
+
+
         return applicationRepository.findByJobId_Id(jobid);
     }
 
@@ -81,7 +97,9 @@ public class ApplicationServiceImapal implements ApplicationService {
     public List<ApplicationResponseDto> viewApplicationRecruterReq(UUID jobid) {
         UUID userId=authserviceImpal.getCurrentUserId();
         return viewApplicationRecruter(jobid,userId).stream()
-                .map(ApplicationMapper::toResponse).collect(Collectors.toList());
+                .map(application -> {
+                    return ApplicationMapper.toResponse(application,"", 0);
+                }).collect(Collectors.toList());
     }
 
     @Override
@@ -114,6 +132,6 @@ public class ApplicationServiceImapal implements ApplicationService {
         applicationRepository.save(app);
 
         // 6. Return response DTO
-        return ApplicationMapper.toResponse(app);
+        return ApplicationMapper.toResponse(app,"", 0);
     }
 }

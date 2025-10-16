@@ -5,6 +5,7 @@ import com.algohire.backend.dto.response.JobDetailsResponseDto;
 import com.algohire.backend.dto.response.JobSummeryResponseDto;
 import com.algohire.backend.exception.ResourceNotFoundException;
 import com.algohire.backend.exception.UnauthorizedActionException;
+import com.algohire.backend.exception.UserNotFoundException;
 import com.algohire.backend.mapper.JobMapper;
 import com.algohire.backend.model.Job;
 import com.algohire.backend.model.Users;
@@ -61,20 +62,26 @@ public class JobServiceImapal implements JobService {
 
 //        job.setJobCategory(category);
         job.setCreatedBy(recruiter);
+        job.setCompany(recruiter.getCompany().getName());
         Job savedJob=addJob(job,jobCreatorId);
+        String compny=recruiter.getCompany().getName();
 
 
-        return JobMapper.toJobSummuryResponse(savedJob);
+        return JobMapper.toJobSummuryResponse(savedJob,compny);
     }
 
     @Override
     public List<JobSummeryResponseDto> viewJob(String city,String keyword) {
       if(city==null)city="";
       if(keyword==null)keyword="";
-      List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCase(city, keyword);
+      List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(city, keyword);
       return jobs.stream()
               .filter(job -> !job.isDeleted())
-              .map(job -> JobMapper.toJobSummuryResponse(job))
+              .map(job -> {
+                  Users users=job.getCreatedBy();
+                  String company=users.getCompany().getName();
+                  return JobMapper.toJobSummuryResponse(job,company);
+              })
               .collect(Collectors.toList());
     }
 
@@ -91,9 +98,14 @@ public class JobServiceImapal implements JobService {
         UUID userid=authService.getCurrentUserId();
         Users users=userRepository.findById(userid).orElseThrow(
                 ()->new UsernameNotFoundException("// user not found in id"+userid+"in getJobrecutrie"));
-        return jobRepository.findByCreatedBy(users).stream()
-                .filter(j->!j.isDeleted())
-                .map(JobMapper::toJobSummuryResponse)
+        return jobRepository.findByCreatedByAndIsDeletedFalseOrderByCreatedAtDesc(users).stream()
+                .map(job -> {
+                    String companyName = null;
+                    if (job.getCreatedBy() != null && job.getCreatedBy().getCompany() != null) {
+                        companyName = job.getCreatedBy().getCompany().getName();
+                    }
+                    return JobMapper.toJobSummuryResponse(job, companyName);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -112,8 +124,8 @@ public class JobServiceImapal implements JobService {
         if (request.getDescription() != null) existJob.setDescription(request.getDescription());
         if (request.getCity() != null) existJob.setCity(request.getCity());
         if (request.getSalary() != null) existJob.setSalary(request.getSalary());
-        if (request.getSkills() != null) existJob.setSkills(request.getSkills());
-        if (request.getExperience() != null) existJob.setExperience(request.getExperience());
+//        if (request.getSkills() != null) existJob.setSkills(request.getSkills());
+        if (request.getExperience() != 0) existJob.setRequiredExperince(request.getExperience());
 
 //        if (request.getJobCategoryId() != null) {
 //            JobCategory category = jobcategoryRepository.findById(request.getJobCategoryId())
@@ -123,9 +135,12 @@ public class JobServiceImapal implements JobService {
 
 
         Job updatedJob = jobRepository.save(existJob);
+        Users users=userRepository.findById(userId).orElseThrow(
+                ()->new UserNotFoundException("user not found"));
+        String company=users.getCompany().getName();
 
 
-        return JobMapper.toJobSummuryResponse(updatedJob);
+        return JobMapper.toJobSummuryResponse(updatedJob,company);
 
     }
 

@@ -1,6 +1,7 @@
 package com.algohire.backend.dto.request;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import com.algohire.backend.enums.JobStatus;
@@ -27,9 +28,9 @@ public class JobRequstDto {
     @NotBlank(message = "Salary is required")
     private String salary;
 
-    private String skills; // optional
+    private Set<String> skills; // optional
 
-    private String experience; // optional
+    private int experience; // optional
 
 
 

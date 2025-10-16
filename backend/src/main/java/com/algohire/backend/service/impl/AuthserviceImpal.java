@@ -45,6 +45,7 @@ public class AuthserviceImpal implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
+        user.setActiveDays(1);
 
         Role role=roleRepository.findByRole(RoleType.CANDIDATE)
                 .orElseThrow(()->new RuntimeException("invalid id"));

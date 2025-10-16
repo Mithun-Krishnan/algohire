@@ -1,6 +1,8 @@
 package com.algohire.backend.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -8,16 +10,7 @@ import java.util.UUID;
 import com.algohire.backend.enums.JobStatus;
 import com.algohire.backend.model.audit.Auditable;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,6 +45,8 @@ public class Job extends Auditable{
     @Column(nullable = false)
     private String city;
 
+    private String company;
+
      
 //    @Column(nullable = false)
 //    private String state;
@@ -70,11 +65,19 @@ public class Job extends Auditable{
 //    @Column(name = "deadline", nullable = false)
 //    private LocalDateTime deadLine;
 
-    @Column
-    private String skills;
+//    @Column
+//    private String skills;
 
-    @Column
-    private String experience;
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "job_skills",
+//            joinColumns = @JoinColumn(name = "job_id"),
+//            inverseJoinColumns = @JoinColumn(name = "skills_id")
+//    )
+    private Set<String> requiredSkills = new HashSet<>();
+
+    @Column(nullable = true)
+    private Integer requiredExperince;
 
 //    @Enumerated(EnumType.STRING)
 //

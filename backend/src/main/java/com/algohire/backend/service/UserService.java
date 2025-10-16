@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.algohire.backend.dto.response.ProfileResponseDto;
-import com.algohire.backend.dto.response.SkillsResponseDto;
-import com.algohire.backend.dto.response.UserResponse;
-import com.algohire.backend.dto.response.UserResponseSkills;
+import com.algohire.backend.dto.request.CompanyRequstDto;
+import com.algohire.backend.dto.request.ProfileUpdateRequestDto;
+import com.algohire.backend.dto.response.*;
 
 public interface UserService {
 
@@ -16,6 +15,8 @@ public interface UserService {
     UserResponseSkills updateSkills(Set<UUID> skillIds);
     List<SkillsResponseDto> getAllSkills();
     ProfileResponseDto getProfile();
+    CompanyResponseDto creteCompany(CompanyRequstDto requst);
+    ProfileResponseDto updateProfile(ProfileUpdateRequestDto request);
 
 
 }

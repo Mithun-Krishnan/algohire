@@ -4,6 +4,7 @@ import com.algohire.backend.dto.request.ApplicationRequestDto;
 import com.algohire.backend.dto.request.ApplicationUpdateRequestDto;
 import com.algohire.backend.dto.response.ApplicationResponseDto;
 import com.algohire.backend.service.impl.ApplicationServiceImapal;
+import com.algohire.backend.service.impl.MatchingServiceImpal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class ApplicationControler {
 
     private final ApplicationServiceImapal applicationServiceImapal;
+    private final MatchingServiceImpal matchingServiceImpal;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('CANDIDATE')")
@@ -31,13 +33,17 @@ public class ApplicationControler {
 
     @GetMapping("/recruiter/view/{jobId}")
     public List<ApplicationResponseDto> viewRecruiter(@PathVariable UUID jobId){
-        return applicationServiceImapal.viewApplicationRecruterReq(jobId);
+//        return applicationServiceImapal.viewApplicationRecruterReq(jobId);
+        return matchingServiceImpal.getCandidateMatching(jobId);
     }
+
 
     @PatchMapping("/recruiter/update")
     @PreAuthorize("hasRole('RECRUITER')")
     public ApplicationResponseDto updateApplication(@RequestBody ApplicationUpdateRequestDto request){
         return applicationServiceImapal.updateApplication(request);
     }
+
+//    @GetMapping("/recruiter/")
 
 }

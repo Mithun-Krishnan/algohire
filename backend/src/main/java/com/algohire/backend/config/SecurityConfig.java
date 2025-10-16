@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->auth
                         .requestMatchers("/auth/v1/login",
                                 "/auth/v1/refreshToken",
@@ -53,8 +53,12 @@ public class SecurityConfig {
                         .requestMatchers("/application/create").hasRole("CANDIDATE")
                         .requestMatchers("/application/candidate/**").hasRole("CANDIDATE")
                         .requestMatchers("/application/recruiter/**").hasRole("RECRUITER")
+                        .requestMatchers("/recruiter/view/**").hasRole("RECRUITER")
+
                         .requestMatchers("/api/uploadToVm","/api/resume/get/{userId}").permitAll()
                         .requestMatchers("/api/company/search/{query}").permitAll()
+                        .requestMatchers("api/users/status","/api/users/addCompany").permitAll()
+                        .requestMatchers("api/users/me/profile/update").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())

@@ -10,10 +10,14 @@ import com.algohire.backend.service.CustomUserDetailsService;
 import com.algohire.backend.service.JwtService;
 import com.algohire.backend.service.RefreshTokenService;
 import com.algohire.backend.service.impl.AuthserviceImpal;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -106,10 +112,22 @@ public class AuthControler {
             String accessToken=jwtService.generateToken(userDetails);
             RefreshToken refreshToken=refreshTokenService.createRefreshToken(userDetails.getUsername());
 
-            String role=userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+                ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/api/auth/refresh")
+                        .maxAge(Duration.ofDays(20))
+                        .sameSite("Strict")
+                        .build();
 
-            return ResponseEntity.ok(JwtResponseDto.builder()
+
+            String role=userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+            
+            return ResponseEntity.ok().header(
+                    HttpHeaders.SET_COOKIE,cookie.toString())
+                    .body(JwtResponseDto.builder()
                     .accessToken(accessToken)
+                            .name(userDetails.getUsername().split("@")[0])
                     .refreshToken(refreshToken.getToken())
                             .role(role)
                     .build());
@@ -136,10 +154,14 @@ public class AuthControler {
 
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtResponseDto> refresh(@RequestBody RefreshTokenRequstDto req) {
+    public ResponseEntity<JwtResponseDto> refresh(@RequestBody HttpServletRequest req) {
 
-        log.info("//Received refresh request for token: {}", req.getToken());
-        RefreshToken token = refreshTokenService.findByToken(req.getToken())
+        Cookie refreshCookie= Arrays.stream(req.getCookies())
+                .filter(c->"refreshToken".equals(c.getName()))
+                .findFirst()
+                .orElseThrow(()->new TokenNotFoundException("Refresh Token not found"));
+
+        RefreshToken token = refreshTokenService.findByToken(refreshCookie.getValue())
                 .orElseThrow(() -> new TokenNotFoundException("Refresh token not found"));
 
         // validate refresh token (throws exception if expired and deletes it)

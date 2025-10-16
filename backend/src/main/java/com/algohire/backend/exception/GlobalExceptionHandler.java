@@ -8,6 +8,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,9 +23,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
+    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
         log.error("Unhandled Exception: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "error");
+        response.put("message", ex.getMessage() != null ? ex.getMessage() : "Internal Server Error");
+        response.put("errorType", ex.getClass().getSimpleName());
+        response.put("timestamp", LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -34,5 +45,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
         log.error("Invalid email or password");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+    }
+
+    @ExceptionHandler(AlreadyAppliedException.class)
+    public ResponseEntity<Map<String,Object>> allpredyApplied(AlreadyAppliedException ex){
+        log.error("alredy aplied"+ex.getMessage());
+
+        Map<String,Object> response=new HashMap<>();
+        response.put("status","eror");
+        response.put("message",ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+
     }
 }

@@ -13,13 +13,13 @@ public class ProfileResponseDto {
     private UUID id;
     private String userName;
     private String email;
+    private String location;
+    private Integer experince;
     private String role;
-    private String phone;
-    private String profilePicUrl;
     private String resumeUrl;
-    private String description;
-    private boolean isActive;
-    private LocalDateTime lastLogin;
+    private String phone;
+//    private String profilePicUrl;
+//    private String resumeUrl;
     private CompanyResponseDto company;  // nested DTO
     private Set<String> skills;       // skill names or IDs
 

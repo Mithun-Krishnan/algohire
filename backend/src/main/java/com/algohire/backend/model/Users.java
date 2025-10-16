@@ -54,6 +54,9 @@ public class Users extends Auditable{
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private String city;
+
     @Size(max = 255)
     @Column(name = "profile_pic_url")
     private String profilePicUrl;
@@ -93,11 +96,17 @@ public class Users extends Auditable{
     @JoinColumn(name = "role_id", nullable = true)
     private Role role;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_skills",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "skills_id")
-    )
-    private Set<Skills> skills=new HashSet<>();
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "user_skills",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "skills_id")
+//    )
+    private Set<String> skills=new HashSet<>();
+
+    @Column(nullable = true)
+    private Integer activeDays;
+
+    @Column(nullable = true)
+    private Integer experince;
 }

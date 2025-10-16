@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -17,8 +18,8 @@ public class JobDetailsResponseDto {
     private String state;
     private String salary;
     private LocalDateTime createdAt;
-    private String skills;
-    private String experience;
+    private Set<String> skills;
+    private int experience;
     private String createdByName;
 
 }
