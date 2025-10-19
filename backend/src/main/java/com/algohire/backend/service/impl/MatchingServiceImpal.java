@@ -31,7 +31,8 @@ public class MatchingServiceImpal implements MatchingService {
         double skillMatch = computeSkillMatch(user.getSkills(), job.getRequiredSkills());
         double experienceMatch = Math.min(1.0, (double) user.getExperince() / job.getRequiredExperince());
         double locationMatch = user.getCity().equalsIgnoreCase(job.getCity()) ? 1.0 : 0.5;
-        double activityScore = user.getActiveDays() < 7 ? 1.0 : 0.7;
+        Integer activedays=(user.getActiveDays()!=null?user.getActiveDays():0);
+        double activityScore = activedays < 7 ? 1.0 : 0.7;
 
         return (0.5 * skillMatch)
                 + (0.3 * experienceMatch)
@@ -66,7 +67,7 @@ public class MatchingServiceImpal implements MatchingService {
         return sortedApplications.stream()
                 .map(app -> {
                     double score = calculateMatchScore(app.getUsers(), job);
-                    return ApplicationMapper.toResponse(app, job.getCompany(), 0);
+                    return ApplicationMapper.toResponse(app, job.getCompany(), score);
                         }
                 )
                 .collect(Collectors.toList());

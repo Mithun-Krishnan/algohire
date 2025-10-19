@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -43,6 +44,7 @@ public class AuthserviceImpal implements AuthService {
         Users user =new Users();
         user.setUsername(request.getName());
         user.setEmail(request.getEmail());
+        user.setLastLogin(LocalDateTime.now());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setActiveDays(1);

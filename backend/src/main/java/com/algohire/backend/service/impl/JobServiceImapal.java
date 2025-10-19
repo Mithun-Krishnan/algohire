@@ -16,6 +16,7 @@ import com.algohire.backend.service.AuthService;
 import com.algohire.backend.service.JobService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -72,14 +73,19 @@ public class JobServiceImapal implements JobService {
 
     @Override
     public List<JobSummeryResponseDto> viewJob(String city,String keyword) {
+        Users users=userRepository.findById(authService.getCurrentUserId()).orElseThrow(
+                ()->new UsernameNotFoundException("no user found")
+        );
+
+        
       if(city==null)city="";
       if(keyword==null)keyword="";
       List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(city, keyword);
       return jobs.stream()
               .filter(job -> !job.isDeleted())
               .map(job -> {
-                  Users users=job.getCreatedBy();
-                  String company=users.getCompany().getName();
+                  Users jobCre=job.getCreatedBy();
+                  String company=jobCre.getCompany().getName();
                   return JobMapper.toJobSummuryResponse(job,company);
               })
               .collect(Collectors.toList());
