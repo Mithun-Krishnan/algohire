@@ -3,11 +3,11 @@ package com.algohire.backend.controller;
 import com.algohire.backend.dto.request.JobRequstDto;
 import com.algohire.backend.dto.response.JobDetailsResponseDto;
 import com.algohire.backend.dto.response.JobSummeryResponseDto;
-import com.algohire.backend.service.JobService;
 import com.algohire.backend.service.impl.JobServiceImapal;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -57,10 +57,14 @@ public class JobControler {
     }
 
     @GetMapping("/serchjob")
-    public ResponseEntity<List<JobSummeryResponseDto>> serchJob(@RequestParam (required = false) String city,
-                                                          @RequestParam(required = false)String keyword){
+    public ResponseEntity<Page<JobSummeryResponseDto>> serchJob(@RequestParam (required = false) String city,
+                                                                @RequestParam(required = false)String keyword,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size){
 
-        List<JobSummeryResponseDto> jobSummeryResponseDtos=jobServiceImapal.viewJob(city, keyword);
+       if(size>100) size=100;
+
+        Page<JobSummeryResponseDto> jobSummeryResponseDtos=jobServiceImapal.viewJob(city, keyword, PageRequest.of(page,size));
         return ResponseEntity.ok(jobSummeryResponseDtos);
 
     }

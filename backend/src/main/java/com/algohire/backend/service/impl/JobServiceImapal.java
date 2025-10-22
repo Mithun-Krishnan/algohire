@@ -16,17 +16,22 @@ import com.algohire.backend.service.AuthService;
 import com.algohire.backend.service.JobService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 
 public class JobServiceImapal implements JobService {
 
@@ -45,12 +50,6 @@ public class JobServiceImapal implements JobService {
 
     public JobSummeryResponseDto createJobfromReq(JobRequstDto requst){
         Job job= JobMapper.jobBuilder(requst);
-//        System.out.println("JobCategoryId from request: " + requst.getJobCategoryId());
-
-        // due to some resne removing the jobcat
-
-//        JobCategory category = jobcategoryRepository.findById(requst.getJobCategoryId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Job category not found"));
 
         UUID jobCreatorId=authService.getCurrentUserId();
         System.out.println(jobCreatorId);
@@ -59,36 +58,33 @@ public class JobServiceImapal implements JobService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found"));
 
 
-
-
-//        job.setJobCategory(category);
         job.setCreatedBy(recruiter);
         job.setCompany(recruiter.getCompany().getName());
         Job savedJob=addJob(job,jobCreatorId);
-        String compny=recruiter.getCompany().getName();
+        log.info("Job created by recruiter: {}", recruiter.getUsername());
+        return JobMapper.toJobSummuryResponse(savedJob,job.getCompany());
 
 
-        return JobMapper.toJobSummuryResponse(savedJob,compny);
     }
 
     @Override
-    public List<JobSummeryResponseDto> viewJob(String city,String keyword) {
+    public Page<JobSummeryResponseDto> viewJob(String city, String keyword, Pageable pageable) {
+
+
+        String normalizedCity=city==null?"":city.trim();
+        String normalizedKeyword=keyword==null?"":keyword.trim();
+
+
         Users users=userRepository.findById(authService.getCurrentUserId()).orElseThrow(
                 ()->new UsernameNotFoundException("no user found")
         );
 
-        
-      if(city==null)city="";
-      if(keyword==null)keyword="";
-      List<Job> jobs=jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(city, keyword);
-      return jobs.stream()
-              .filter(job -> !job.isDeleted())
-              .map(job -> {
-                  Users jobCre=job.getCreatedBy();
-                  String company=jobCre.getCompany().getName();
-                  return JobMapper.toJobSummuryResponse(job,company);
-              })
-              .collect(Collectors.toList());
+
+      return jobRepository.findByCityContainingIgnoreCaseAndTitleContainingIgnoreCaseAndIsDeletedFalseOrderByCreatedAtDesc
+                      (normalizedCity, normalizedKeyword,pageable)
+
+                      .map(job -> JobMapper.toJobSummuryResponse(job, job.getCompany()));
+
     }
 
     @Override
